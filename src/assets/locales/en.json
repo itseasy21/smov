@@ -98,7 +98,7 @@
       "github": "GitHub",
       "twitter": "Twitter"
     },
-    "tagline": "Watch your favorite shows and movies for free with no ads ever! (っ'ヮ'c)"
+    "tagline": "Coolmoviez is a well-known movie-downloading platform that provides users with access to the latest releases in a variety of file formats. You may also watch web series here, in addition to movies. You may find movies and web series in a variety of languages, including the most recent releases in English, Hindi, Dubbed, Bengali, Punjabi, etc."
   },
   "global": {
     "name": "coolmoviez",
@@ -148,7 +148,7 @@
         "default": "Welcome, find media to watch here!",
         "extra": [
           "There's nothing here :(",
-          "So empty...",
+          "So empty... start watching something",
           "Such emptiness.",
           "Hi new user :3"
         ]
