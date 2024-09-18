@@ -22,6 +22,7 @@ import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
 import { JipPage } from "@/pages/Jip";
 import { LoginPage } from "@/pages/Login";
+import { MediaPreview } from "@/pages/MediaPreview";
 import { OnboardingPage } from "@/pages/onboarding/Onboarding";
 import { OnboardingExtensionPage } from "@/pages/onboarding/OnboardingExtension";
 import { OnboardingProxyPage } from "@/pages/onboarding/OnboardingProxy";
@@ -154,6 +155,7 @@ function App() {
           <Route path="/jip" element={<JipPage />} />
           {/* Discover page */}
           <Route path="/discover" element={<Discover />} />
+          <Route path="/details/:mediaType/:id" element={<MediaPreview />} />
           {/* Settings page */}
           <Route
             path="/settings"

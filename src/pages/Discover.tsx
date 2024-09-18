@@ -18,6 +18,7 @@ import {
   categories,
   tvCategories,
 } from "@/utils/discover";
+import { cleanTitle } from "@/utils/title";
 
 import { SubPageLayout } from "./layouts/SubPageLayout";
 import { Icon, Icons } from "../components/Icon";
@@ -357,9 +358,7 @@ export function Discover() {
                 key={media.id}
                 onClick={() =>
                   navigate(
-                    `/media/tmdb-${isTVShow ? "tv" : "movie"}-${media.id}-${
-                      isTVShow ? media.name : media.title
-                    }`,
+                    `/details/${isTVShow ? "tv" : "movie"}/${media.id}-${cleanTitle(media.name || media.title)}`,
                   )
                 }
                 className="text-center relative mt-3 mx-[0.285em] mb-3 transition-transform hover:scale-105 duration-[0.45s]"
@@ -449,7 +448,7 @@ export function Discover() {
         // Schedule navigation after 5 seconds
         const timeoutId = setTimeout(() => {
           navigate(
-            `/media/tmdb-movie-${selectedMovie.id}-${selectedMovie.title}`,
+            `/details/movie/${selectedMovie.id}-${cleanTitle(selectedMovie.name || selectedMovie.title)}`,
           );
         }, 5000);
         setCountdownTimeout(timeoutId);

@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { get } from "@/backend/metadata/tmdb";
 import { Button } from "@/components/buttons/Button";
 import { ThiccContainer } from "@/components/layout/ThinContainer";
 import { conf } from "@/setup/config";
+import { cleanTitle } from "@/utils/title";
 
 import { SubPageLayout } from "./layouts/SubPageLayout";
 import { Icon, Icons } from "../components/Icon";
-import { PageTitle } from "./parts/util/PageTitle";
 
 interface MediaDetails {
   id: number;
@@ -47,38 +46,76 @@ interface Credits {
 }
 
 interface Images {
-  backdrops: { file_path: string }[];
+  backdrops: {
+    file_path: string;
+    vote_average: number;
+  }[];
+}
+
+interface RelatedMedia {
+  id: number;
+  title?: string;
+  name?: string;
+  poster_path: string;
+}
+
+function Spinner() {
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
+    </div>
+  );
 }
 
 export function MediaPreview() {
-  const { t } = useTranslation();
   const { mediaType, id } = useParams<{ mediaType: string; id: string }>();
   const [mediaDetails, setMediaDetails] = useState<MediaDetails | null>(null);
   const [credits, setCredits] = useState<Credits | null>(null);
   const [images, setImages] = useState<Images | null>(null);
+  const [relatedMedia, setRelatedMedia] = useState<RelatedMedia[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const getBestBackdrop = (tmpImages: Images) => {
+    if (tmpImages.backdrops.length === 0) return null;
+    return tmpImages.backdrops.reduce((prev, current) =>
+      prev.vote_average > current.vote_average ? prev : current,
+    ).file_path;
+  };
 
   useEffect(() => {
     const fetchMediaData = async () => {
+      setLoading(true);
       try {
-        const [detailsData, creditsData, imagesData] = await Promise.all([
-          get<MediaDetails>(`/${mediaType}/${id}`, {
-            api_key: conf().TMDB_READ_API_KEY,
-            language: "en-US",
-          }),
-          get<Credits>(`/${mediaType}/${id}/credits`, {
-            api_key: conf().TMDB_READ_API_KEY,
-          }),
-          get<Images>(`/${mediaType}/${id}/images`, {
-            api_key: conf().TMDB_READ_API_KEY,
-          }),
-        ]);
+        const mediaId = id?.split("-") ?? [id];
+        const [detailsData, creditsData, imagesData, relatedData] =
+          await Promise.all([
+            get<MediaDetails>(`/${mediaType}/${mediaId[0]}`, {
+              api_key: conf().TMDB_READ_API_KEY,
+              language: "en-US",
+            }),
+            get<Credits>(`/${mediaType}/${mediaId[0]}/credits`, {
+              api_key: conf().TMDB_READ_API_KEY,
+            }),
+            get<Images>(`/${mediaType}/${mediaId[0]}/images`, {
+              api_key: conf().TMDB_READ_API_KEY,
+            }),
+            get<{ results: RelatedMedia[] }>(
+              `/${mediaType}/${mediaId[0]}/similar`,
+              {
+                api_key: conf().TMDB_READ_API_KEY,
+                language: "en-US",
+              },
+            ),
+          ]);
 
         setMediaDetails(detailsData);
         setCredits(creditsData);
         setImages(imagesData);
+        setRelatedMedia(relatedData.results.slice(0, 6));
       } catch (error) {
         console.error("Error fetching media data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -87,18 +124,23 @@ export function MediaPreview() {
 
   const handleWatchNow = () => {
     const title = mediaDetails?.title || mediaDetails?.name || "";
-    navigate(`/media/tmdb-${mediaType}-${id}-${title}`);
+    navigate(`/media/tmdb-${mediaType}-${id}-${cleanTitle(title)}`);
   };
 
+  if (loading) {
+    return <Spinner />;
+  }
+
   if (!mediaDetails || !credits || !images) {
-    return <div>Loading...</div>;
+    return <div>Error loading media details</div>;
   }
 
   const title = mediaDetails.title || mediaDetails.name || "";
   const releaseDate = mediaDetails.release_date || mediaDetails.first_air_date;
   const runtime = mediaDetails.runtime || mediaDetails.episode_run_time?.[0];
-  const backdropUrl = mediaDetails.backdrop_path
-    ? `https://image.tmdb.org/t/p/original${mediaDetails.backdrop_path}`
+  const bestBackdropPath = getBestBackdrop(images);
+  const heroImageUrl = bestBackdropPath
+    ? `https://image.tmdb.org/t/p/original${bestBackdropPath}`
     : null;
 
   const schemaData = {
@@ -129,19 +171,37 @@ export function MediaPreview() {
         <title>{`${title} - Preview`}</title>
         <meta name="description" content={mediaDetails.overview} />
         <script type="application/ld+json">{JSON.stringify(schemaData)}</script>
+        <style type="text/css">{`
+            html, body {
+              scrollbar-width: none;
+              -ms-overflow-style: none;
+            }
+          `}</style>
       </Helmet>
-      <PageTitle subpage k={`${title} Preview`} />
-      {backdropUrl && (
+
+      {heroImageUrl && (
         <div
-          className="absolute top-0 left-0 w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${backdropUrl})`,
-            filter: "blur(8px)",
-            opacity: 0.3,
-            zIndex: -1,
-          }}
-        />
+          className="relative w-full h-[40vh] mb-8 overflow-hidden"
+          style={{ marginTop: "-90px" }}
+        >
+          <img
+            src={heroImageUrl}
+            alt={`${title} backdrop`}
+            className="w-full h-full object-cover object-top"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent">
+            <ThiccContainer classNames="h-full flex flex-col justify-end pb-8">
+              <h1 className="text-4xl font-bold text-white mb-2">{title}</h1>
+              {mediaDetails.tagline && (
+                <p className="text-xl text-gray-300 italic">
+                  {mediaDetails.tagline}
+                </p>
+              )}
+            </ThiccContainer>
+          </div>
+        </div>
       )}
+
       <ThiccContainer>
         <div className="flex flex-col md:flex-row items-start mt-8">
           <div className="w-full md:w-1/3 mb-6 md:mb-0 md:mr-8">
@@ -152,12 +212,6 @@ export function MediaPreview() {
             />
           </div>
           <div className="w-full md:w-2/3">
-            <h1 className="text-3xl font-bold text-white mb-2">{title}</h1>
-            {mediaDetails.tagline && (
-              <p className="text-gray-400 italic mb-4">
-                {mediaDetails.tagline}
-              </p>
-            )}
             <p className="text-gray-300 mb-4">{mediaDetails.overview}</p>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="flex items-center">
@@ -254,6 +308,33 @@ export function MediaPreview() {
                   .join(", ")}
               </p>
             </div>
+          </div>
+        </div>
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Related {mediaType === "movie" ? "Movies" : "Shows"}
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {relatedMedia.map((media) => (
+              <div
+                key={media.id}
+                className="cursor-pointer"
+                onClick={() =>
+                  navigate(
+                    `/details/${mediaType}/${media.id}-${cleanTitle(media.name || media.title)}`,
+                  )
+                }
+              >
+                <img
+                  src={`https://image.tmdb.org/t/p/w300${media.poster_path}`}
+                  alt={media.title || media.name}
+                  className="w-full rounded-lg shadow-lg transition-transform duration-300 hover:scale-105"
+                />
+                <p className="text-sm text-gray-300 mt-2">
+                  {media.title || media.name}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </ThiccContainer>
