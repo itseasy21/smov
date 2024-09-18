@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -59,11 +59,55 @@ interface RelatedMedia {
   poster_path: string;
 }
 
+interface Video {
+  key: string;
+  site: string;
+  type: string;
+}
+
+interface Review {
+  id: string;
+  author: string;
+  content: string;
+  created_at: string;
+}
+
+interface Trivia {
+  id: string;
+  content: string;
+}
+
 function Spinner() {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
     </div>
+  );
+}
+
+function LazyImage({
+  src,
+  alt,
+  className,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+}) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <>
+      {!isLoaded && (
+        <div className={`${className} bg-gray-300 animate-pulse`} />
+      )}
+      <img
+        src={src}
+        alt={alt}
+        className={`${className} ${isLoaded ? "block" : "hidden"}`}
+        onLoad={() => setIsLoaded(true)}
+      />
+    </>
   );
 }
 
@@ -73,45 +117,71 @@ export function MediaPreview() {
   const [credits, setCredits] = useState<Credits | null>(null);
   const [images, setImages] = useState<Images | null>(null);
   const [relatedMedia, setRelatedMedia] = useState<RelatedMedia[]>([]);
+  const [trailer, setTrailer] = useState<Video | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [trivia, setTrivia] = useState<Trivia[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const getBestBackdrop = (tmpImages: Images) => {
+
+  const getBestBackdrop = useCallback((tmpImages: Images) => {
     if (tmpImages.backdrops.length === 0) return null;
     return tmpImages.backdrops.reduce((prev, current) =>
       prev.vote_average > current.vote_average ? prev : current,
     ).file_path;
-  };
+  }, []);
 
   useEffect(() => {
     const fetchMediaData = async () => {
       setLoading(true);
       try {
         const mediaId = id?.split("-") ?? [id];
-        const [detailsData, creditsData, imagesData, relatedData] =
-          await Promise.all([
-            get<MediaDetails>(`/${mediaType}/${mediaId[0]}`, {
+        const [
+          detailsData,
+          creditsData,
+          imagesData,
+          relatedData,
+          videosData,
+          reviewsData,
+          triviaData,
+        ] = await Promise.all([
+          get<MediaDetails>(`/${mediaType}/${mediaId[0]}`, {
+            api_key: conf().TMDB_READ_API_KEY,
+            language: "en-US",
+          }),
+          get<Credits>(`/${mediaType}/${mediaId[0]}/credits`, {
+            api_key: conf().TMDB_READ_API_KEY,
+          }),
+          get<Images>(`/${mediaType}/${mediaId[0]}/images`, {
+            api_key: conf().TMDB_READ_API_KEY,
+          }),
+          get<{ results: RelatedMedia[] }>(
+            `/${mediaType}/${mediaId[0]}/recommendations`,
+            {
               api_key: conf().TMDB_READ_API_KEY,
               language: "en-US",
-            }),
-            get<Credits>(`/${mediaType}/${mediaId[0]}/credits`, {
-              api_key: conf().TMDB_READ_API_KEY,
-            }),
-            get<Images>(`/${mediaType}/${mediaId[0]}/images`, {
-              api_key: conf().TMDB_READ_API_KEY,
-            }),
-            get<{ results: RelatedMedia[] }>(
-              `/${mediaType}/${mediaId[0]}/similar`,
-              {
-                api_key: conf().TMDB_READ_API_KEY,
-                language: "en-US",
-              },
-            ),
-          ]);
+            },
+          ),
+          get<{ results: Video[] }>(`/${mediaType}/${mediaId[0]}/videos`, {
+            api_key: conf().TMDB_READ_API_KEY,
+          }),
+          get<{ results: Review[] }>(`/${mediaType}/${mediaId[0]}/reviews`, {
+            api_key: conf().TMDB_READ_API_KEY,
+          }),
+          // Note: TMDB doesn't have a trivia endpoint, so this is a placeholder
+          Promise.resolve({ results: [] as Trivia[] }),
+        ]);
 
         setMediaDetails(detailsData);
         setCredits(creditsData);
         setImages(imagesData);
         setRelatedMedia(relatedData.results.slice(0, 6));
+        setTrailer(
+          videosData.results.find(
+            (video) => video.type === "Trailer" && video.site === "YouTube",
+          ) || null,
+        );
+        setReviews(reviewsData.results.slice(0, 3));
+        setTrivia(triviaData.results);
       } catch (error) {
         console.error("Error fetching media data:", error);
       } finally {
@@ -125,6 +195,39 @@ export function MediaPreview() {
   const handleWatchNow = () => {
     const title = mediaDetails?.title || mediaDetails?.name || "";
     navigate(`/media/tmdb-${mediaType}-${id}-${cleanTitle(title)}`);
+  };
+
+  const handleShare = (platform: string) => {
+    const url = window.location.href;
+    const title = mediaDetails?.title || mediaDetails?.name || "";
+    switch (platform) {
+      case "twitter":
+        window.open(
+          `https://twitter.com/intent/tweet?text=Check out ${title}&url=${url}`,
+          "_blank",
+        );
+        break;
+      case "facebook":
+        window.open(
+          `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+          "_blank",
+        );
+        break;
+      case "linkedin":
+        window.open(
+          `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`,
+          "_blank",
+        );
+        break;
+      case "whatsapp":
+        window.open(
+          `https://wa.me/?text=${encodeURIComponent(`Watch ${title} with me at: ${url}`)}`,
+          "_blank",
+        );
+        break;
+      default:
+        break;
+    }
   };
 
   if (loading) {
@@ -155,6 +258,7 @@ export function MediaPreview() {
       ratingValue: mediaDetails.vote_average,
       bestRating: "10",
       worstRating: "0",
+      reviewCount: reviews.length,
     },
     director: credits.crew.find((person) => person.job === "Director")?.name,
     actor: credits.cast.slice(0, 5).map((actor) => ({
@@ -163,20 +267,37 @@ export function MediaPreview() {
     })),
     duration: runtime ? `PT${runtime}M` : undefined,
     genre: mediaDetails.genres.map((genre) => genre.name),
+    review: reviews.map((review) => ({
+      "@type": "Review",
+      reviewBody: review.content,
+      author: {
+        "@type": "Person",
+        name: review.author,
+      },
+      datePublished: review.created_at,
+    })),
   };
 
   return (
     <SubPageLayout>
       <Helmet>
-        <title>{`${title} - Preview`}</title>
+        <title>{`${title} - Watch Now`}</title>
         <meta name="description" content={mediaDetails.overview} />
+        <meta property="og:title" content={`${title} - Watch Now`} />
+        <meta property="og:description" content={mediaDetails.overview} />
+        <meta
+          property="og:image"
+          content={`https://image.tmdb.org/t/p/w500${mediaDetails.poster_path}`}
+        />
+        <meta property="og:type" content="video.movie" />
+        <meta property="og:url" content={window.location.href} />
         <script type="application/ld+json">{JSON.stringify(schemaData)}</script>
         <style type="text/css">{`
-            html, body {
-              scrollbar-width: none;
-              -ms-overflow-style: none;
-            }
-          `}</style>
+          html, body {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+        `}</style>
       </Helmet>
 
       {heroImageUrl && (
@@ -184,7 +305,7 @@ export function MediaPreview() {
           className="relative w-full h-[40vh] mb-8 overflow-hidden"
           style={{ marginTop: "-90px" }}
         >
-          <img
+          <LazyImage
             src={heroImageUrl}
             alt={`${title} backdrop`}
             className="w-full h-full object-cover object-top"
@@ -205,7 +326,7 @@ export function MediaPreview() {
       <ThiccContainer>
         <div className="flex flex-col md:flex-row items-start mt-8">
           <div className="w-full md:w-1/3 mb-6 md:mb-0 md:mr-8">
-            <img
+            <LazyImage
               src={`https://image.tmdb.org/t/p/w500${mediaDetails.poster_path}`}
               alt={title}
               className="w-full rounded-xl shadow-lg"
@@ -237,8 +358,7 @@ export function MediaPreview() {
                 </span>
               </div>
             </div>
-            {/* Ad Slot 1 */}
-            <div className="flex justify-center mb-6 mt-4">
+            <div className="flex justify-center mb-10 mt-10">
               <Button
                 theme="secondary"
                 onClick={handleWatchNow}
@@ -247,42 +367,109 @@ export function MediaPreview() {
                 Watch Now
               </Button>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Cast</h2>
-            <div className="flex overflow-x-auto space-x-4 mb-6">
-              {credits.cast.slice(0, 10).map((actor) => (
-                <div key={actor.id} className="flex-shrink-0 w-24">
-                  <img
-                    src={
-                      actor.profile_path
-                        ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
-                        : "https://placehold.co/24x42"
-                    }
-                    alt={actor.name}
-                    className="w-24 h-24 object-cover rounded-full mb-2"
-                  />
-                  <p className="text-center text-sm text-gray-300">
-                    {actor.name}
-                  </p>
-                  <p className="text-center text-xs text-gray-400">
-                    {actor.character}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Screenshots</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {images.backdrops.slice(0, 6).map((image, index) => (
-                <img
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={`screenshot-${index}`}
-                  src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
-                  alt={`${title} screenshot ${index + 1}`}
-                  className="w-full rounded-lg"
-                />
-              ))}
+            <div className="flex justify-center space-x-4 mb-6">
+              <Button
+                onClick={() => handleShare("twitter")}
+                aria-label="Share on Twitter"
+                className="text-blue-400 hover:text-blue-600"
+              >
+                <Icon icon={Icons.TWITTER} />
+              </Button>
+              <Button
+                onClick={() => handleShare("facebook")}
+                aria-label="Share on Facebook"
+                className="text-blue-600 hover:text-blue-800"
+              >
+                <Icon icon={Icons.FACEBOOK} />
+              </Button>
+              <Button
+                onClick={() => handleShare("whatsapp")}
+                aria-label="Share on WhatsApp"
+                className="text-green-500 hover:text-green-700"
+              >
+                <Icon icon={Icons.WHATSAPP} />
+              </Button>
             </div>
           </div>
         </div>
+
+        {trailer && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Trailer</h2>
+            <div className="aspect-w-16 aspect-h-9">
+              <iframe
+                src={`https://www.youtube.com/embed/${trailer.key}`}
+                title="Trailer"
+                frameBorder="0"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        )}
+
+        <h2 className="text-2xl font-bold text-white mb-4 mt-8">Cast</h2>
+        <div className="flex overflow-x-auto space-x-4 mb-6">
+          {credits.cast.slice(0, 10).map((actor) => (
+            <div key={actor.id} className="flex-shrink-0 w-24">
+              <LazyImage
+                src={
+                  actor.profile_path
+                    ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
+                    : "https://placehold.co/24x42"
+                }
+                alt={actor.name}
+                className="w-24 h-24 object-cover rounded-full mb-2"
+              />
+              <p className="text-center text-sm text-gray-300">{actor.name}</p>
+              <p className="text-center text-xs text-gray-400">
+                {actor.character}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <h2 className="text-2xl font-bold text-white mb-4">Photo Gallery</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {images.backdrops.slice(0, 6).map((image, index) => (
+            <LazyImage
+              // eslint-disable-next-line react/no-array-index-key
+              key={`screenshot-${index}`}
+              src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
+              alt={`${title} screenshot ${index + 1}`}
+              className="w-full rounded-lg"
+            />
+          ))}
+        </div>
+
+        {reviews.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Reviews</h2>
+            {reviews.map((review) => (
+              <div key={review.id} className="mb-4 p-4 bg-gray-800 rounded-lg">
+                <p className="text-white font-bold">{review.author}</p>
+                <p className="text-gray-300">
+                  {review.content.slice(0, 200)}...
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {trivia.length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Trivia</h2>
+            <ul className="list-disc list-inside text-gray-300">
+              {trivia.map((item) => (
+                <li key={item.id} className="mb-2">
+                  {item.content}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-white mb-4">
             Additional Information
@@ -310,9 +497,10 @@ export function MediaPreview() {
             </div>
           </div>
         </div>
+
         <div className="mt-12">
           <h2 className="text-2xl font-bold text-white mb-4">
-            Related {mediaType === "movie" ? "Movies" : "Shows"}
+            Recommended {mediaType === "movie" ? "Movies" : "Shows"}
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {relatedMedia.map((media) => (
@@ -321,13 +509,13 @@ export function MediaPreview() {
                 className="cursor-pointer"
                 onClick={() =>
                   navigate(
-                    `/details/${mediaType}/${media.id}-${cleanTitle(media.name || media.title)}`,
+                    `/details/${mediaType}/${media.id}-${cleanTitle(media.name || media.title || "")}`,
                   )
                 }
               >
-                <img
+                <LazyImage
                   src={`https://image.tmdb.org/t/p/w300${media.poster_path}`}
-                  alt={media.title || media.name}
+                  alt={media.title || media.name || ""}
                   className="w-full rounded-lg shadow-lg transition-transform duration-300 hover:scale-105"
                 />
                 <p className="text-sm text-gray-300 mt-2">
