@@ -3,12 +3,17 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
-import { mediaItemToId } from "@/backend/metadata/tmdb";
+import {
+  mediaItemToId,
+  mediaItemTypeToMediaType,
+  mediaTypeToTMDB,
+} from "@/backend/metadata/tmdb";
 import { DotList } from "@/components/text/DotList";
 import { Flare } from "@/components/utils/Flare";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { MediaItem } from "@/utils/mediaTypes";
+import { cleanTitle } from "@/utils/title";
 
 import { MediaBookmarkButton } from "./MediaBookmark";
 import { IconPatch } from "../buttons/IconPatch";
@@ -196,7 +201,7 @@ export function MediaCard(props: MediaCardProps) {
   const canLink = props.linkable && !props.closable && isReleased();
 
   let link = canLink
-    ? `/media/${encodeURIComponent(mediaItemToId(props.media))}`
+    ? `/details/${mediaTypeToTMDB(mediaItemTypeToMediaType(props.media.type))}/${props.media.id}-${cleanTitle(props.media.title)}`
     : "#";
   if (canLink && props.series) {
     if (props.series.season === 0 && !props.series.episodeId) {
