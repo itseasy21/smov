@@ -204,7 +204,7 @@
     "menu": {
       "about": "About us",
       "logout": "Log out",
-      "register": "Sync to sudo-cloud",
+      "register": "Register to sync",
       "settings": "Settings",
       "support": "Support",
       "discover": "Discover"
