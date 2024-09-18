@@ -163,14 +163,17 @@ function App() {
               </Suspense>
             }
           />
-          {/* admin routes */}
-          <Route path="/admin" element={<AdminPage />} />
-          {/* other */}
-          <Route path="/dev" element={<DeveloperPage />} />
-          <Route path="/dev/video" element={<VideoTesterView />} />
           {/* developer routes that can abuse workers are disabled in production */}
           {process.env.NODE_ENV === "development" ? (
-            <Route path="/dev/test" element={<TestView />} />
+            <>
+              {/* admin routes */}
+              <Route path="/admin" element={<AdminPage />} />
+              {/* other */}
+              <Route path="/dev" element={<DeveloperPage />} />
+              <Route path="/dev/video" element={<VideoTesterView />} />
+
+              <Route path="/dev/test" element={<TestView />} />
+            </>
           ) : null}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
