@@ -1,3 +1,21 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Allow: /discover
+Allow: /details/
+Allow: /media/
+
+# Disallow any potential admin or private areas
+Disallow: /admin/
+Disallow: /dev/
+
+# Prevent crawling of search results pages
+Disallow: /search
+
+# Prevent crawling of any API endpoints
+Disallow: /api/
+
+# Add a crawl delay to prevent overwhelming your server
+Crawl-delay: 10
+
+# Point to your sitemap
+Sitemap: https://coolmoviez.lol/sitemap.xml
