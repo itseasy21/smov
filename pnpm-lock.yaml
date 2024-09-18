@@ -40,8 +40,8 @@ importers:
         specifier: ^0.7.2
         version: 0.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@movie-web/providers':
-        specifier: github:VidBingeApp/providers
-        version: https://codeload.github.com/VidBingeApp/providers/tar.gz/f2b5f5d987cffbfe788cc85af8303be867d89ed9
+        specifier: github:itseasy21/vidbinge-providers
+        version: https://codeload.github.com/itseasy21/vidbinge-providers/tar.gz/2bf1a27f0b8767675aa65f4223de391143ab944a
       '@noble/hashes':
         specifier: ^1.5.0
         version: 1.5.0
@@ -231,7 +231,7 @@ importers:
         version: 6.21.0(eslint@8.57.0)(typescript@5.6.2)
       '@vitejs/plugin-react':
         specifier: ^4.3.1
-        version: 4.3.1(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0))
+        version: 4.3.1(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0))
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.4.45)
@@ -309,22 +309,22 @@ importers:
         version: 5.6.2
       vite:
         specifier: ^5.4.3
-        version: 5.4.3(@types/node@20.16.5)(terser@5.32.0)
+        version: 5.4.3(@types/node@20.16.5)(terser@5.33.0)
       vite-plugin-checker:
         specifier: ^0.6.4
-        version: 0.6.4(eslint@8.57.0)(optionator@0.9.4)(typescript@5.6.2)(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0))
+        version: 0.6.4(eslint@8.57.0)(optionator@0.9.4)(typescript@5.6.2)(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0))
       vite-plugin-package-version:
         specifier: ^1.1.0
-        version: 1.1.0(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0))
+        version: 1.1.0(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0))
       vite-plugin-pwa:
         specifier: ^0.17.5
-        version: 0.17.5(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
+        version: 0.17.5(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0)
       vite-plugin-static-copy:
         specifier: ^1.0.6
-        version: 1.0.6(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0))
+        version: 1.0.6(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0))
       vitest:
         specifier: ^1.6.0
-        version: 1.6.0(@types/node@20.16.5)(jsdom@23.2.0)(terser@5.32.0)
+        version: 1.6.0(@types/node@20.16.5)(jsdom@23.2.0)(terser@5.33.0)
       workbox-window:
         specifier: ^7.1.0
         version: 7.1.0
@@ -1202,8 +1202,8 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@movie-web/providers@https://codeload.github.com/VidBingeApp/providers/tar.gz/f2b5f5d987cffbfe788cc85af8303be867d89ed9':
-    resolution: {tarball: https://codeload.github.com/VidBingeApp/providers/tar.gz/f2b5f5d987cffbfe788cc85af8303be867d89ed9}
+  '@movie-web/providers@https://codeload.github.com/itseasy21/vidbinge-providers/tar.gz/2bf1a27f0b8767675aa65f4223de391143ab944a':
+    resolution: {tarball: https://codeload.github.com/itseasy21/vidbinge-providers/tar.gz/2bf1a27f0b8767675aa65f4223de391143ab944a}
     version: 2.3.0
 
   '@noble/hashes@1.5.0':
@@ -1777,9 +1777,9 @@ packages:
   cheerio-select@2.1.0:
     resolution: {integrity: sha512-9v9kG0LvzrlcungtnJtpGNxY+fzECQKhK4EGJX2vByejiMX84MFNQw4UxPJl3bFbTMw+Dfs37XaIkCwTZfLh4g==}
 
-  cheerio@1.0.0-rc.12:
-    resolution: {integrity: sha512-VqR8m68vM46BNnuZ5NtnGBKIE/DfN0cRIzg9n40EIq9NOv90ayxLBXA8fXC5gquFRGJSTRqBq25Jt2ECLR431Q==}
-    engines: {node: '>= 6'}
+  cheerio@1.0.0:
+    resolution: {integrity: sha512-quS9HgjQpdaXOvsZz82Oz7uxtXiy6UIsIQcpBj7HRw2M63Skasm9qlDocAM7jNuaxdhpPU7c4kJN+gA5MCu4ww==}
+    engines: {node: '>=18.17'}
 
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
@@ -2039,6 +2039,9 @@ packages:
 
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
+
+  encoding-sniffer@0.2.0:
+    resolution: {integrity: sha512-ju7Wq1kg04I3HtiYIOrUrdfdDvkyO9s5XM8QAj/bN61Yo/Vb4vgJxy5vi4Yxk01gWHbrofpPtpxM8bKger9jhg==}
 
   enhanced-resolve@5.17.1:
     resolution: {integrity: sha512-LMHl3dXhTcfv8gM4kEzIUeTQ+7fpdA0l2tUf34BddXPkz2A5xJ5L/Pchd5BL6rdccM9QGvu0sWZzK1Z1t4wwyg==}
@@ -2489,8 +2492,8 @@ packages:
   html-parse-stringify@3.0.1:
     resolution: {integrity: sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==}
 
-  htmlparser2@8.0.2:
-    resolution: {integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==}
+  htmlparser2@9.1.0:
+    resolution: {integrity: sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==}
 
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
@@ -3093,6 +3096,9 @@ packages:
 
   parse5-htmlparser2-tree-adapter@7.0.0:
     resolution: {integrity: sha512-B77tOZrqqfUfnVcOrUvfdLbz4pu4RopLD/4vmu3HUPswwTA8OH0EMW9BlWR2B0RCoiZRAHEUu7IxeP1Pd1UU+g==}
+
+  parse5-parser-stream@7.1.2:
+    resolution: {integrity: sha512-JyeQc9iwFLn5TbvvqACIF/VXG6abODeB3Fwmv/TGdLk2LfbWkaySGY72at4+Ty7EkPZj854u4CrICqNk2qIbow==}
 
   parse5@7.1.2:
     resolution: {integrity: sha512-Czj1WaSVpaoj0wbhMzLmWD69anp2WH7FXMB9n1Sy8/ZFF9jolSQVMu1Ij5WIyGmcBmhk7EOndpO4mIpihVqAXw==}
@@ -3746,8 +3752,8 @@ packages:
     resolution: {integrity: sha512-G13vtMYPT/J8A4X2SjdtBTphZlrp1gKv6hZiOjw14RCWg6GbHuQBGtjlx75xLbYV/wEc0D7G5K4rxKP/cXk8Bw==}
     engines: {node: '>=10'}
 
-  terser@5.32.0:
-    resolution: {integrity: sha512-v3Gtw3IzpBJ0ugkxEX8U0W6+TnPKRRCWGh1jC/iM/e3Ki5+qvO1L1EAZ56bZasc64aXHwRHNIQEzm6//i5cemQ==}
+  terser@5.33.0:
+    resolution: {integrity: sha512-JuPVaB7s1gdFKPKTelwUyRq5Sid2A3Gko2S0PncwdBq7kN9Ti9HPWDQ06MPsEDGsZeVESjKEnyGy68quBk1w6g==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -3882,6 +3888,10 @@ packages:
 
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
+
+  undici@6.19.8:
+    resolution: {integrity: sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==}
+    engines: {node: '>=18.17'}
 
   unicode-canonical-property-names-ecmascript@2.0.0:
     resolution: {integrity: sha512-yY5PpDlfVIU5+y/BSCxAJRBIS1Zc2dDG3Ujq+sR0U+JjUevW2JhocOF+soROYDSaAezOzOKuyyixhD6mBknSmQ==}
@@ -5289,9 +5299,9 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@movie-web/providers@https://codeload.github.com/VidBingeApp/providers/tar.gz/f2b5f5d987cffbfe788cc85af8303be867d89ed9':
+  '@movie-web/providers@https://codeload.github.com/itseasy21/vidbinge-providers/tar.gz/2bf1a27f0b8767675aa65f4223de391143ab944a':
     dependencies:
-      cheerio: 1.0.0-rc.12
+      cheerio: 1.0.0
       cookie: 0.6.0
       crypto-js: 4.2.0
       form-data: 4.0.0
@@ -5395,7 +5405,7 @@ snapshots:
     dependencies:
       serialize-javascript: 6.0.2
       smob: 1.5.0
-      terser: 5.32.0
+      terser: 5.33.0
     optionalDependencies:
       rollup: '@rollup/wasm-node@4.21.3'
 
@@ -5672,14 +5682,14 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@4.3.1(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0))':
+  '@vitejs/plugin-react@4.3.1(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0))':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.25.2)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.3(@types/node@20.16.5)(terser@5.32.0)
+      vite: 5.4.3(@types/node@20.16.5)(terser@5.33.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -5973,15 +5983,19 @@ snapshots:
       domhandler: 5.0.3
       domutils: 3.1.0
 
-  cheerio@1.0.0-rc.12:
+  cheerio@1.0.0:
     dependencies:
       cheerio-select: 2.1.0
       dom-serializer: 2.0.0
       domhandler: 5.0.3
       domutils: 3.1.0
-      htmlparser2: 8.0.2
+      encoding-sniffer: 0.2.0
+      htmlparser2: 9.1.0
       parse5: 7.1.2
       parse5-htmlparser2-tree-adapter: 7.0.0
+      parse5-parser-stream: 7.1.2
+      undici: 6.19.8
+      whatwg-mimetype: 4.0.0
 
   chokidar@3.6.0:
     dependencies:
@@ -6240,6 +6254,11 @@ snapshots:
   emoji-regex@8.0.0: {}
 
   emoji-regex@9.2.2: {}
+
+  encoding-sniffer@0.2.0:
+    dependencies:
+      iconv-lite: 0.6.3
+      whatwg-encoding: 3.1.1
 
   enhanced-resolve@5.17.1:
     dependencies:
@@ -6872,7 +6891,7 @@ snapshots:
     dependencies:
       void-elements: 3.1.0
 
-  htmlparser2@8.0.2:
+  htmlparser2@9.1.0:
     dependencies:
       domelementtype: 2.3.0
       domhandler: 5.0.3
@@ -7470,6 +7489,10 @@ snapshots:
   parse5-htmlparser2-tree-adapter@7.0.0:
     dependencies:
       domhandler: 5.0.3
+      parse5: 7.1.2
+
+  parse5-parser-stream@7.1.2:
+    dependencies:
       parse5: 7.1.2
 
   parse5@7.1.2:
@@ -8088,7 +8111,7 @@ snapshots:
       type-fest: 0.16.0
       unique-string: 2.0.0
 
-  terser@5.32.0:
+  terser@5.33.0:
     dependencies:
       '@jridgewell/source-map': 0.3.6
       acorn: 8.12.1
@@ -8219,6 +8242,8 @@ snapshots:
 
   undici-types@6.19.8: {}
 
+  undici@6.19.8: {}
+
   unicode-canonical-property-names-ecmascript@2.0.0: {}
 
   unicode-match-property-ecmascript@2.0.0:
@@ -8270,13 +8295,13 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite-node@1.6.0(@types/node@20.16.5)(terser@5.32.0):
+  vite-node@1.6.0(@types/node@20.16.5)(terser@5.33.0):
     dependencies:
       cac: 6.7.14
       debug: 4.3.7
       pathe: 1.1.2
       picocolors: 1.1.0
-      vite: 5.4.3(@types/node@20.16.5)(terser@5.32.0)
+      vite: 5.4.3(@types/node@20.16.5)(terser@5.33.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -8288,7 +8313,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-checker@0.6.4(eslint@8.57.0)(optionator@0.9.4)(typescript@5.6.2)(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0)):
+  vite-plugin-checker@0.6.4(eslint@8.57.0)(optionator@0.9.4)(typescript@5.6.2)(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0)):
     dependencies:
       '@babel/code-frame': 7.24.7
       ansi-escapes: 4.3.2
@@ -8301,7 +8326,7 @@ snapshots:
       semver: 7.6.3
       strip-ansi: 6.0.1
       tiny-invariant: 1.3.3
-      vite: 5.4.3(@types/node@20.16.5)(terser@5.32.0)
+      vite: 5.4.3(@types/node@20.16.5)(terser@5.33.0)
       vscode-languageclient: 7.0.0
       vscode-languageserver: 7.0.0
       vscode-languageserver-textdocument: 1.0.12
@@ -8311,30 +8336,30 @@ snapshots:
       optionator: 0.9.4
       typescript: 5.6.2
 
-  vite-plugin-package-version@1.1.0(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0)):
+  vite-plugin-package-version@1.1.0(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0)):
     dependencies:
-      vite: 5.4.3(@types/node@20.16.5)(terser@5.32.0)
+      vite: 5.4.3(@types/node@20.16.5)(terser@5.33.0)
 
-  vite-plugin-pwa@0.17.5(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0):
+  vite-plugin-pwa@0.17.5(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0))(workbox-build@7.1.1(@types/babel__core@7.20.5))(workbox-window@7.1.0):
     dependencies:
       debug: 4.3.7
       fast-glob: 3.3.2
       pretty-bytes: 6.1.1
-      vite: 5.4.3(@types/node@20.16.5)(terser@5.32.0)
+      vite: 5.4.3(@types/node@20.16.5)(terser@5.33.0)
       workbox-build: 7.1.1(@types/babel__core@7.20.5)
       workbox-window: 7.1.0
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-static-copy@1.0.6(vite@5.4.3(@types/node@20.16.5)(terser@5.32.0)):
+  vite-plugin-static-copy@1.0.6(vite@5.4.3(@types/node@20.16.5)(terser@5.33.0)):
     dependencies:
       chokidar: 3.6.0
       fast-glob: 3.3.2
       fs-extra: 11.2.0
       picocolors: 1.1.0
-      vite: 5.4.3(@types/node@20.16.5)(terser@5.32.0)
+      vite: 5.4.3(@types/node@20.16.5)(terser@5.33.0)
 
-  vite@5.4.3(@types/node@20.16.5)(terser@5.32.0):
+  vite@5.4.3(@types/node@20.16.5)(terser@5.33.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.45
@@ -8342,9 +8367,9 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.16.5
       fsevents: 2.3.3
-      terser: 5.32.0
+      terser: 5.33.0
 
-  vitest@1.6.0(@types/node@20.16.5)(jsdom@23.2.0)(terser@5.32.0):
+  vitest@1.6.0(@types/node@20.16.5)(jsdom@23.2.0)(terser@5.33.0):
     dependencies:
       '@vitest/expect': 1.6.0
       '@vitest/runner': 1.6.0
@@ -8363,8 +8388,8 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.9.0
       tinypool: 0.8.4
-      vite: 5.4.3(@types/node@20.16.5)(terser@5.32.0)
-      vite-node: 1.6.0(@types/node@20.16.5)(terser@5.32.0)
+      vite: 5.4.3(@types/node@20.16.5)(terser@5.33.0)
+      vite-node: 1.6.0(@types/node@20.16.5)(terser@5.33.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.16.5
