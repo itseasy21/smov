@@ -2,9 +2,9 @@ User-agent: *
 Allow: /
 Allow: /discover
 Allow: /details/
-Allow: /media/
 
 # Disallow any potential admin or private areas
+Disallow: /media/
 Disallow: /admin/
 Disallow: /dev/
 
