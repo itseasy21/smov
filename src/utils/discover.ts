@@ -6,6 +6,7 @@ export interface Media {
   poster_path: string;
   title?: string;
   name?: string;
+  release_date?: string;
 }
 
 // Update the Movie and TVShow interfaces to extend the Media interface

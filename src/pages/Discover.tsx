@@ -1,4 +1,3 @@
-// Based mfs only use only one 500 line file instead of ten 50 line files.
 import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
@@ -8,6 +7,7 @@ import { get } from "@/backend/metadata/tmdb";
 import { ThiccContainer } from "@/components/layout/ThinContainer";
 import { Divider } from "@/components/utils/Divider";
 import { Flare } from "@/components/utils/Flare";
+import { useSearch } from "@/hooks/useSearch";
 import { conf } from "@/setup/config";
 import {
   Category,
@@ -22,6 +22,8 @@ import { cleanTitle } from "@/utils/title";
 
 import { SubPageLayout } from "./layouts/SubPageLayout";
 import { Icon, Icons } from "../components/Icon";
+import { SearchListPart } from "./parts/search/SearchListPart";
+import { SearchLoadingPart } from "./parts/search/SearchLoadingPart";
 import { PageTitle } from "./parts/util/PageTitle";
 
 export function Discover() {
@@ -48,6 +50,8 @@ export function Discover() {
   const gradientRef = useRef<HTMLDivElement>(null);
   const [countdownTimeout, setCountdownTimeout] =
     useState<NodeJS.Timeout | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const s = useSearch(searchQuery);
 
   useEffect(() => {
     const fetchMoviesForCategory = async (category: Category) => {
@@ -312,9 +316,10 @@ export function Discover() {
   }, [isHovered]);
 
   function renderMovies(medias: Media[], category: string, isTVShow = false) {
-    const categorySlug = `${category.toLowerCase().replace(/ /g, "-")}${Math.random()}`; // Convert the category to a slug
-    const displayCategory =
-      category === "Now Playing"
+    const categorySlug = `${category.toLowerCase().replace(/ /g, "-")}${Math.random()}`;
+    const displayCategory = category.includes("Search Results")
+      ? category
+      : category === "Now Playing"
         ? "In Cinemas"
         : category.includes("Movie")
           ? `${category}s`
@@ -475,7 +480,7 @@ export function Discover() {
     <SubPageLayout>
       <div className="mb-16 sm:mb-2">
         <Helmet>
-          {/* Hide scrollbar lmao */}
+          {/* Hide scrollbar */}
           <style type="text/css">{`
             html, body {
               scrollbar-width: none;
@@ -493,6 +498,39 @@ export function Discover() {
         </div>
       </div>
       <ThiccContainer>
+        {/* Search Section */}
+        <div className="mb-8">
+          <div className="relative flex items-center justify-center">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search movies and TV shows"
+              className="w-full max-w-2xl px-6 py-4 pr-12 rounded-full bg-search-background text-white focus:outline-none"
+            />
+            <div className="flex items-center">
+              {searchQuery ? (
+                <button
+                  type="button"
+                  className="text-gray-400 hover:text-white focus:outline-none"
+                  style={{ marginLeft: "-40px" }}
+                  onClick={() => setSearchQuery("")}
+                >
+                  <Icon icon={Icons.X} />
+                </button>
+              ) : (
+                <div
+                  className="text-gray-400 hover:text-white focus:outline-none"
+                  style={{ marginLeft: "-40px" }}
+                >
+                  <Icon icon={Icons.SEARCH} />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Random Movie Button */}
         <div className="flex items-center justify-center mb-6">
           <button
             type="button"
@@ -531,53 +569,64 @@ export function Discover() {
             </p>
           </div>
         )}
-        <div className="flex flex-col">
-          {categories.map((category) => (
-            <div
-              key={category.name}
-              id={`carousel-${category.name.toLowerCase().replace(/ /g, "-")}`}
-              className="mt-8"
-            >
-              {renderMovies(categoryMovies[category.name] || [], category.name)}
+
+        {/* Search Results or Regular Content */}
+        {s.loading ? (
+          <SearchLoadingPart />
+        ) : s.searching ? (
+          <SearchListPart searchQuery={searchQuery} />
+        ) : (
+          <div className="flex flex-col">
+            {categories.map((category) => (
+              <div
+                key={category.name}
+                id={`carousel-${category.name.toLowerCase().replace(/ /g, "-")}`}
+                className="mt-8"
+              >
+                {renderMovies(
+                  categoryMovies[category.name] || [],
+                  category.name,
+                )}
+              </div>
+            ))}
+            {genres.map((genre) => (
+              <div
+                key={`${genre.id}|${genre.name}`}
+                id={`carousel-${genre.name.toLowerCase().replace(/ /g, "-")}`}
+                className="mt-8"
+              >
+                {renderMovies(genreMovies[genre.id] || [], genre.name)}
+              </div>
+            ))}
+            <div className="flex items-center">
+              <Divider marginClass="mr-5" />
+              <h1 className="text-4xl font-bold text-white mx-auto">Shows</h1>
+              <Divider marginClass="ml-5" />
             </div>
-          ))}
-          {genres.map((genre) => (
-            <div
-              key={`${genre.id}|${genre.name}`}
-              id={`carousel-${genre.name.toLowerCase().replace(/ /g, "-")}`}
-              className="mt-8"
-            >
-              {renderMovies(genreMovies[genre.id] || [], genre.name)}
-            </div>
-          ))}
-          <div className="flex items-center">
-            <Divider marginClass="mr-5" />
-            <h1 className="text-4xl font-bold text-white mx-auto">Shows</h1>
-            <Divider marginClass="ml-5" />
+            {tvCategories.map((category) => (
+              <div
+                key={category.name}
+                id={`carousel-${category.name.toLowerCase().replace(/ /g, "-")}`}
+                className="mt-8"
+              >
+                {renderMovies(
+                  categoryShows[category.name] || [],
+                  category.name,
+                  true,
+                )}
+              </div>
+            ))}
+            {tvGenres.map((genre) => (
+              <div
+                key={`${genre.id}|${genre.name}`}
+                id={`carousel-${genre.name.toLowerCase().replace(/ /g, "-")}`}
+                className="mt-8"
+              >
+                {renderMovies(tvShowGenres[genre.id] || [], genre.name, true)}
+              </div>
+            ))}
           </div>
-          {tvCategories.map((category) => (
-            <div
-              key={category.name}
-              id={`carousel-${category.name.toLowerCase().replace(/ /g, "-")}`}
-              className="mt-8"
-            >
-              {renderMovies(
-                categoryShows[category.name] || [],
-                category.name,
-                true,
-              )}
-            </div>
-          ))}
-          {tvGenres.map((genre) => (
-            <div
-              key={`${genre.id}|${genre.name}`}
-              id={`carousel-${genre.name.toLowerCase().replace(/ /g, "-")}`}
-              className="mt-8"
-            >
-              {renderMovies(tvShowGenres[genre.id] || [], genre.name, true)}
-            </div>
-          ))}
-        </div>
+        )}
       </ThiccContainer>
     </SubPageLayout>
   );

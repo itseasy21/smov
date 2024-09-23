@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useTranslation } from "react-i18next";
 import { To, useNavigate } from "react-router-dom";
 
 import { WideContainer } from "@/components/layout/WideContainer";
-import { useDebounce } from "@/hooks/useDebounce";
 import { useRandomTranslation } from "@/hooks/useRandomTranslation";
+import { useSearch } from "@/hooks/useSearch";
 import { useSearchQuery } from "@/hooks/useSearchQuery";
 import { Button } from "@/pages/About";
 import { HomeLayout } from "@/pages/layouts/HomeLayout";
@@ -14,25 +14,6 @@ import { HeroPart } from "@/pages/parts/home/HeroPart";
 import { WatchingPart } from "@/pages/parts/home/WatchingPart";
 import { SearchListPart } from "@/pages/parts/search/SearchListPart";
 import { SearchLoadingPart } from "@/pages/parts/search/SearchLoadingPart";
-
-function useSearch(search: string) {
-  const [searching, setSearching] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const debouncedSearch = useDebounce<string>(search, 500);
-  useEffect(() => {
-    setSearching(search !== "");
-    setLoading(search !== "");
-  }, [search]);
-  useEffect(() => {
-    setLoading(false);
-  }, [debouncedSearch]);
-
-  return {
-    loading,
-    searching,
-  };
-}
 
 // What the sigma?
 
