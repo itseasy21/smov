@@ -13,7 +13,7 @@ async function fetchMovies(page = 1, results = []) {
   const response = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}`, {headers});
   results = results.concat(response.data.results);
   
-  if (page < 5) { // Fetch 5 pages of results, adjust as needed
+  if (page < 15) { // Fetch 5 pages of results, adjust as needed
     return fetchMovies(page + 1, results);
   }
   
@@ -24,7 +24,7 @@ async function fetchTVShows(page = 1, results = []) {
   const response = await axios.get(`https://api.themoviedb.org/3/tv/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}`, {headers});
   results = results.concat(response.data.results);
   
-  if (page < 5) { // Fetch 5 pages of results, adjust as needed
+  if (page < 15) { // Fetch 5 pages of results, adjust as needed
     return fetchTVShows(page + 1, results);
   }
   
