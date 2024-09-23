@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { get } from "@/backend/metadata/tmdb";
 import { ThiccContainer } from "@/components/layout/ThinContainer";
+import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
 import { Divider } from "@/components/utils/Divider";
 import { Flare } from "@/components/utils/Flare";
 import { useSearch } from "@/hooks/useSearch";
@@ -18,6 +19,7 @@ import {
   categories,
   tvCategories,
 } from "@/utils/discover";
+import { MediaItem } from "@/utils/mediaTypes";
 import { cleanTitle } from "@/utils/title";
 
 import { SubPageLayout } from "./layouts/SubPageLayout";
@@ -327,7 +329,6 @@ export function Discover() {
             ? `${category} Shows`
             : `${category} Movies`;
 
-    // https://tailwindcss.com/docs/border-style
     return (
       <div className="relative overflow-hidden mt-2">
         <h2 className="text-2xl cursor-default font-bold text-white sm:text-3xl md:text-2xl mx-auto pl-5">
@@ -338,7 +339,6 @@ export function Discover() {
           className="flex whitespace-nowrap pt-4 overflow-auto scrollbar rounded-xl overflow-y-hidden"
           style={{
             scrollbarWidth: "thin",
-            // scrollbarColor: `${bgColor} transparent`,
             scrollbarColor: "transparent transparent",
           }}
           ref={(el) => {
@@ -358,46 +358,65 @@ export function Discover() {
               );
             })
             .slice(0, 20)
-            .map((media) => (
-              <a
-                key={media.id}
-                onClick={() =>
-                  navigate(
-                    `/details/${isTVShow ? "tv" : "movie"}/${media.id}-${cleanTitle(media.name || media.title)}`,
-                  )
-                }
-                className="text-center relative mt-3 mx-[0.285em] mb-3 transition-transform hover:scale-105 duration-[0.45s]"
-                style={{ flex: `0 0 ${movieWidth}` }} // Set a fixed width for each movie
-              >
-                <Flare.Base className="group cursor-pointer rounded-xl relative p-[0.65em] bg-background-main transition-colors duration-300 bg-transparent">
-                  <Flare.Light
-                    flareSize={300}
-                    cssColorVar="--colors-mediaCard-hoverAccent"
-                    backgroundClass="bg-mediaCard-hoverBackground duration-200"
-                    className="rounded-xl bg-background-main group-hover:opacity-100"
-                  />
-                  <img
-                    src={
-                      media.poster_path
-                        ? `https://image.tmdb.org/t/p/w500${media.poster_path}`
-                        : "/placeholder.png"
-                    }
-                    alt={media.poster_path ? "" : "failed to fetch :("}
-                    loading="lazy"
-                    className="rounded-xl relative"
-                  />
-                  <h1 className="group relative pt-2 text-[13.5px] whitespace-normal duration-[0.35s] font-semibold text-white opacity-0 group-hover:opacity-100">
-                    {isTVShow
-                      ? (media.name?.length ?? 0) > 32
-                        ? `${media.name?.slice(0, 32)}...`
-                        : media.name
-                      : (media.title?.length ?? 0) > 32
-                        ? `${media.title?.slice(0, 32)}...`
-                        : media.title}
-                  </h1>
-                </Flare.Base>
-              </a>
-            ))}
+            .map((media) => {
+              const mediaItem: MediaItem = {
+                id: media.id.toString(),
+                title: media.title || media.name || "",
+                year: media.release_date
+                  ? new Date(media.release_date).getFullYear()
+                  : undefined,
+                release_date: media.release_date
+                  ? new Date(media.release_date)
+                  : undefined,
+                type: isTVShow ? "show" : "movie",
+                poster: media.poster_path
+                  ? `https://image.tmdb.org/t/p/w500${media.poster_path}`
+                  : undefined,
+              };
+
+              return (
+                <div
+                  key={media.id}
+                  className="text-center relative mt-3 mx-[0.285em] mb-3 transition-transform hover:scale-105 duration-[0.45s]"
+                  style={{ flex: `0 0 ${movieWidth}` }}
+                  onClick={() =>
+                    navigate(
+                      `/details/${isTVShow ? "tv" : "movie"}/${media.id}-${cleanTitle(media.name || media.title)}`,
+                    )
+                  }
+                >
+                  <Flare.Base className="group cursor-pointer rounded-xl relative p-[0.65em] bg-background-main transition-colors duration-300 bg-transparent">
+                    <Flare.Light
+                      flareSize={300}
+                      cssColorVar="--colors-mediaCard-hoverAccent"
+                      backgroundClass="bg-mediaCard-hoverBackground duration-200"
+                      className="rounded-xl bg-background-main group-hover:opacity-100"
+                    />
+                    <div className="relative">
+                      <img
+                        src={mediaItem.poster || "/placeholder.png"}
+                        alt={mediaItem.poster ? "" : "failed to fetch :("}
+                        loading="lazy"
+                        className="rounded-xl relative w-full"
+                      />
+                      <div
+                        className="absolute top-2 left-2"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent navigation when clicking the bookmark button
+                        }}
+                      >
+                        <MediaBookmarkButton media={mediaItem} />
+                      </div>
+                    </div>
+                    <h1 className="group relative pt-2 text-[13.5px] whitespace-normal duration-[0.35s] font-semibold text-white opacity-0 group-hover:opacity-100">
+                      {mediaItem.title.length > 32
+                        ? `${mediaItem.title.slice(0, 32)}...`
+                        : mediaItem.title}
+                    </h1>
+                  </Flare.Base>
+                </div>
+              );
+            })}
         </div>
 
         <div className="flex items-center justify-center">
