@@ -5,7 +5,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { get } from "@/backend/metadata/tmdb";
 import { Button } from "@/components/buttons/Button";
 import { ThiccContainer } from "@/components/layout/ThinContainer";
+import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
 import { conf } from "@/setup/config";
+import { MediaItem } from "@/utils/mediaTypes";
 import { cleanTitle } from "@/utils/title";
 
 import { SubPageLayout } from "./layouts/SubPageLayout";
@@ -278,6 +280,17 @@ export function MediaPreview() {
     })),
   };
 
+  const mediaItem: MediaItem = {
+    id: mediaDetails.id.toString(),
+    title: mediaDetails.title || mediaDetails.name || "",
+    year: releaseDate ? new Date(releaseDate).getFullYear() : undefined,
+    release_date: releaseDate ? new Date(releaseDate) : undefined,
+    type: mediaType === "movie" ? "movie" : "show",
+    poster: mediaDetails.poster_path
+      ? `https://image.tmdb.org/t/p/w500${mediaDetails.poster_path}`
+      : undefined,
+  };
+
   return (
     <SubPageLayout>
       <Helmet>
@@ -358,14 +371,16 @@ export function MediaPreview() {
                 </span>
               </div>
             </div>
-            <div className="flex justify-center mb-10 mt-10">
+            <div className="flex flex-col sm:flex-row justify-center items-center mb-10 mt-10 space-y-4 sm:space-y-0 sm:space-x-8">
               <Button
-                theme="secondary"
+                theme="purple"
                 onClick={handleWatchNow}
-                className="bg-primary-main hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-full transition duration-300"
+                className="w-full sm:w-auto bg-primary-main hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-full transition duration-300 text-lg"
               >
+                <Icon icon={Icons.PLAY} className="mr-2" />
                 Watch Now
               </Button>
+              <MediaBookmarkButton media={mediaItem} showWording />
             </div>
             <div className="flex justify-center space-x-4 mb-6">
               <Button
