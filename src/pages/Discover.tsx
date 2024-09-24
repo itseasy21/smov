@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
 import { get } from "@/backend/metadata/tmdb";
+import { Ad } from "@/components/Ad";
 import { ThiccContainer } from "@/components/layout/ThinContainer";
 import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
 import { Divider } from "@/components/utils/Divider";
@@ -608,6 +609,8 @@ export function Discover() {
                 )}
               </div>
             ))}
+
+            <Ad type="native4:1" className="my-4" />
             {genres.map((genre) => (
               <div
                 key={`${genre.id}|${genre.name}`}

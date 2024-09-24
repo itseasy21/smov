@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { get } from "@/backend/metadata/tmdb";
+import { Ad } from "@/components/Ad";
 import { Button } from "@/components/buttons/Button";
 import { ThiccContainer } from "@/components/layout/ThinContainer";
 import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
@@ -370,6 +371,9 @@ export function MediaPreview() {
                   {mediaDetails.genres.map((g) => g.name).join(", ")}
                 </span>
               </div>
+            </div>
+            <div className="flex flex-col sm:flex-row justify-center items-center mb-10 mt-10 space-y-4 sm:space-y-0 sm:space-x-8">
+              <Ad type="468" className="my-4" />
             </div>
             <div className="flex flex-col sm:flex-row justify-center items-center mb-10 mt-10 space-y-4 sm:space-y-0 sm:space-x-8">
               <Button
