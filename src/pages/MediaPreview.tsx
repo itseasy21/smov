@@ -14,6 +14,11 @@ import { cleanTitle } from "@/utils/title";
 import { SubPageLayout } from "./layouts/SubPageLayout";
 import { Icon, Icons } from "../components/Icon";
 
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
 interface MediaDetails {
   id: number;
   title?: string;
@@ -111,6 +116,68 @@ function LazyImage({
         onLoad={() => setIsLoaded(true)}
       />
     </>
+  );
+}
+
+function FAQItem({
+  faq,
+  isOpen,
+  toggleFAQ,
+}: {
+  faq: FAQ;
+  isOpen: boolean;
+  toggleFAQ: () => void;
+}) {
+  return (
+    <div className="border-b border-gray-700">
+      <Button
+        className="flex justify-between items-center w-full py-4 px-6 text-left focus:outline-none"
+        onClick={toggleFAQ}
+        theme="secondary"
+      >
+        <span className="text-lg font-semibold text-white">{faq.question}</span>
+        <Icon
+          icon={isOpen ? Icons.CHEVRON_UP : Icons.CHEVRON_DOWN}
+          className={`text-white transition-transform duration-300 ${isOpen ? "transform rotate-180" : ""}`}
+        />
+      </Button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <p className="py-4 px-6 text-gray-300">{faq.answer}</p>
+      </div>
+    </div>
+  );
+}
+
+function FAQSection({ faqs }: { faqs: FAQ[] }) {
+  const [openFAQs, setOpenFAQs] = useState<number[]>([]);
+
+  function toggleFAQ(index: number) {
+    setOpenFAQs((prev: number[]) =>
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
+    );
+  }
+
+  return (
+    <div className="mt-8">
+      <h2 className="text-2xl font-bold text-white mb-4">
+        Frequently Asked Questions
+      </h2>
+      <div className="bg-gray-800 rounded-lg overflow-hidden">
+        {faqs.map((faq, index) => (
+          <FAQItem
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            faq={faq}
+            isOpen={openFAQs.includes(index)}
+            toggleFAQ={() => toggleFAQ(index)}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -249,6 +316,32 @@ export function MediaPreview() {
     ? `https://image.tmdb.org/t/p/original${bestBackdropPath}`
     : null;
 
+  const faqs: FAQ[] = [
+    {
+      question: `Where can I watch ${title}?`,
+      answer: `You can watch ${title} right here on our website. Just click the 'Watch Now' button to start streaming in 4K with support for HDR-10, HDR-10+, and Dolby Atmos.`,
+    },
+    {
+      question: `Is ${title} available for free?`,
+      answer: `We offer a selection of free content, but some titles may require a subscription or rental fee. Check the 'Watch Now' button for specific details about ${title}.`,
+    },
+    {
+      question: `What is the release date of ${title}?`,
+      answer: `${title} was released on ${releaseDate || "N/A"}. You can stream it on our platform now!`,
+    },
+    {
+      question: `Who are the main actors in ${title}?`,
+      answer: `The main cast of ${title} includes ${credits.cast
+        .slice(0, 3)
+        .map((actor) => actor.name)
+        .join(", ")}.`,
+    },
+    {
+      question: `What genre is ${title}?`,
+      answer: `${title} is classified as ${mediaDetails.genres.map((g) => g.name).join(", ")}.`,
+    },
+  ];
+
   const schemaData = {
     "@context": "https://schema.org",
     "@type": mediaType === "movie" ? "Movie" : "TVSeries",
@@ -261,7 +354,7 @@ export function MediaPreview() {
       ratingValue: mediaDetails.vote_average,
       bestRating: "10",
       worstRating: "0",
-      reviewCount: reviews.length,
+      reviewCount: reviews.length ?? 7,
     },
     director: credits.crew.find((person) => person.job === "Director")?.name,
     actor: credits.cast.slice(0, 5).map((actor) => ({
@@ -278,6 +371,14 @@ export function MediaPreview() {
         name: review.author,
       },
       datePublished: review.created_at,
+    })),
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
     })),
   };
 
@@ -296,7 +397,14 @@ export function MediaPreview() {
     <SubPageLayout>
       <Helmet>
         <title>{`${title} - Watch Now`}</title>
-        <meta name="description" content={mediaDetails.overview} />
+        <meta
+          name="description"
+          content={`Stream ${title} online. ${mediaDetails.overview}`}
+        />
+        <meta
+          name="keywords"
+          content={`watch ${title}, ${mediaType}, ${mediaDetails.genres.map((g) => g.name).join(", ")}, streaming, online`}
+        />
         <meta property="og:title" content={`${title} - Watch Now`} />
         <meta property="og:description" content={mediaDetails.overview} />
         <meta
@@ -305,6 +413,7 @@ export function MediaPreview() {
         />
         <meta property="og:type" content="video.movie" />
         <meta property="og:url" content={window.location.href} />
+        <link rel="canonical" href={window.location.href} />
         <script type="application/ld+json">{JSON.stringify(schemaData)}</script>
         <style type="text/css">{`
           html, body {
@@ -348,6 +457,19 @@ export function MediaPreview() {
           </div>
           <div className="w-full md:w-2/3">
             <p className="text-gray-300 mb-4">{mediaDetails.overview}</p>
+            <p className="mt-2 mb-4">
+              Released in {mediaDetails.release_date?.slice(0, 4) || "N/A"},{" "}
+              {title} is a {mediaDetails.genres.map((g) => g.name).join(", ")}{" "}
+              {mediaType}. Directed by{" "}
+              {credits.crew.find((person) => person.job === "Director")?.name ||
+                "Unknown"}
+              , it features{" "}
+              {credits.cast
+                .slice(0, 3)
+                .map((actor) => actor.name)
+                .join(", ")}{" "}
+              in leading roles.
+            </p>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="flex items-center">
                 <Icon icon={Icons.CLOCK} className="text-gray-400 mr-2" />
@@ -543,6 +665,7 @@ export function MediaPreview() {
               </div>
             ))}
           </div>
+          <FAQSection faqs={faqs} />
         </div>
       </ThiccContainer>
     </SubPageLayout>
