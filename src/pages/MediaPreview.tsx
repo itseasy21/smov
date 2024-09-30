@@ -7,6 +7,7 @@ import { Ad } from "@/components/Ad";
 import { Button } from "@/components/buttons/Button";
 import { ThiccContainer } from "@/components/layout/ThinContainer";
 import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
+import { YouTubeEmbed } from "@/components/YoutubeEmbed";
 import { conf } from "@/setup/config";
 import { MediaItem } from "@/utils/mediaTypes";
 import { cleanTitle } from "@/utils/title";
@@ -565,16 +566,12 @@ export function MediaPreview() {
         {trailer && (
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-white mb-4">Trailer</h2>
-            <div className="aspect-w-16 aspect-h-9">
-              <iframe
-                src={`https://www.youtube.com/embed/${trailer.key}`}
-                title="Trailer"
-                frameBorder="0"
-                allow="autoplay; encrypted-media"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </div>
+            <YouTubeEmbed
+              videoId={trailer.key}
+              width="100%"
+              height="400px"
+              imgSize="maxresdefault"
+            />
           </div>
         )}
 
