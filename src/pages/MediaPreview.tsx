@@ -548,3 +548,5 @@ export function MediaPreview() {
     </SubPageLayout>
   );
 }
+
+export default MediaPreview;

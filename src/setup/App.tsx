@@ -22,7 +22,6 @@ import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { HomePage } from "@/pages/HomePage";
 import { JipPage } from "@/pages/Jip";
 import { LoginPage } from "@/pages/Login";
-import { MediaPreview } from "@/pages/MediaPreview";
 import { OnboardingPage } from "@/pages/onboarding/Onboarding";
 import { OnboardingExtensionPage } from "@/pages/onboarding/OnboardingExtension";
 import { OnboardingProxyPage } from "@/pages/onboarding/OnboardingProxy";
@@ -36,9 +35,11 @@ const DeveloperPage = lazy(() => import("@/pages/DeveloperPage"));
 const TestView = lazy(() => import("@/pages/developer/TestView"));
 const PlayerView = lazyWithPreload(() => import("@/pages/PlayerView"));
 const SettingsPage = lazyWithPreload(() => import("@/pages/Settings"));
+const MediaPreview = lazyWithPreload(() => import("@/pages/MediaPreview"));
 
 PlayerView.preload();
 SettingsPage.preload();
+MediaPreview.preload();
 
 function LegacyUrlView({ children }: { children: ReactElement }) {
   const location = useLocation();
@@ -155,7 +156,16 @@ function App() {
           <Route path="/jip" element={<JipPage />} />
           {/* Discover page */}
           <Route path="/discover" element={<Discover />} />
-          <Route path="/details/:mediaType/:id" element={<MediaPreview />} />
+          <Route
+            path="/details/:mediaType/:id"
+            element={
+              <LegacyUrlView>
+                <Suspense fallback={null}>
+                  <MediaPreview />
+                </Suspense>
+              </LegacyUrlView>
+            }
+          />
           {/* Settings page */}
           <Route
             path="/settings"
