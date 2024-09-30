@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -93,31 +93,59 @@ function Spinner() {
   );
 }
 
-function LazyImage({
-  src,
-  alt,
-  className,
-}: {
-  src: string;
-  alt: string;
-  className: string;
-}) {
-  const [isLoaded, setIsLoaded] = useState(false);
+const LazyImage: React.FC<{ src: string; alt: string; className: string }> =
+  React.memo(
+    ({
+      src,
+      alt,
+      className,
+    }: {
+      src: string;
+      alt: string;
+      className: string;
+    }) => {
+      const [isLoaded, setIsLoaded] = useState(false);
+      const [isInView, setIsInView] = useState(false);
+      const imgRef = React.useRef<HTMLDivElement>(null);
 
-  return (
-    <>
-      {!isLoaded && (
-        <div className={`${className} bg-gray-300 animate-pulse`} />
-      )}
-      <img
-        src={src}
-        alt={alt}
-        className={`${className} ${isLoaded ? "block" : "hidden"}`}
-        onLoad={() => setIsLoaded(true)}
-      />
-    </>
+      useEffect(() => {
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              setIsInView(true);
+              observer.disconnect();
+            }
+          },
+          { threshold: 0.1 },
+        );
+
+        const currentImgRef = imgRef.current; // Capture the current value
+
+        if (currentImgRef) {
+          observer.observe(currentImgRef);
+        }
+
+        return () => {
+          if (currentImgRef) {
+            observer.unobserve(currentImgRef);
+          }
+        };
+      }, []);
+
+      return (
+        <div ref={imgRef} className={`${className} bg-gray-300`}>
+          {isInView && (
+            <img
+              src={src}
+              alt={alt}
+              className={`${className} ${isLoaded ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
+              onLoad={() => setIsLoaded(true)}
+            />
+          )}
+        </div>
+      );
+    },
   );
-}
 
 function FAQItem({
   faq,
