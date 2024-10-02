@@ -425,17 +425,23 @@ export function MediaPreview() {
   return (
     <SubPageLayout>
       <Helmet>
-        <title>{`${title} - Watch Now`}</title>
+        <title>{`${title} Full ${mediaType} - Watch Now`}</title>
         <meta
           name="description"
-          content={`Stream ${title} online. ${mediaDetails.overview}`}
+          content={`Stream ${title} full movie online. ${mediaDetails.overview}`}
         />
         <meta
           name="keywords"
-          content={`watch ${title}, ${mediaType}, ${mediaDetails.genres.map((g) => g.name).join(", ")}, streaming, online`}
+          content={`watch ${title}, ${mediaType}, ${mediaDetails.genres.map((g) => g.name).join(", ")}, streaming, online, full movie`}
         />
-        <meta property="og:title" content={`${title} - Watch Now`} />
-        <meta property="og:description" content={mediaDetails.overview} />
+        <meta
+          property="og:title"
+          content={`${title} Full ${mediaType} - Watch Now`}
+        />
+        <meta
+          property="og:description"
+          content={`Stream ${title} full movie online. ${mediaDetails.overview}`}
+        />
         <meta
           property="og:image"
           content={`https://image.tmdb.org/t/p/w500${mediaDetails.poster_path}`}
