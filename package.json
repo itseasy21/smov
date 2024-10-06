@@ -13,7 +13,7 @@
     "lint:fix": "eslint --fix --ext .tsx,.ts src",
     "lint:report": "eslint --ext .tsx,.ts --output-file eslint_report.json --format json src",
     "preinstall": "npx -y only-allow pnpm",
-    "generate-sitemap": "node generateSitemap.js"
+    "generate-sitemap": "node generateSitemap.mjs"
   },
   "browserslist": {
     "production": [
@@ -61,6 +61,7 @@
     "nanoid": "^5.0.7",
     "node-forge": "^1.3.1",
     "ofetch": "^1.4.0",
+    "p-limit": "^6.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-ga4": "^2.1.0",
