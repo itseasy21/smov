@@ -5,7 +5,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { get } from "@/backend/metadata/tmdb";
 import { Ad } from "@/components/Ad";
 import { Button } from "@/components/buttons/Button";
+import FAQSection from "@/components/faq/FAQSection";
+import { FAQ } from "@/components/faq/types";
 import { ThiccContainer } from "@/components/layout/ThinContainer";
+import LazyImage from "@/components/lazyimage/LazyImage";
 import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
 import { YouTubeEmbed } from "@/components/YoutubeEmbed";
 import { conf } from "@/setup/config";
@@ -14,11 +17,6 @@ import { cleanTitle } from "@/utils/title";
 
 import { SubPageLayout } from "./layouts/SubPageLayout";
 import { Icon, Icons } from "../components/Icon";
-
-interface FAQ {
-  question: string;
-  answer: string;
-}
 
 interface MediaDetails {
   id: number;
@@ -90,122 +88,6 @@ function Spinner() {
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
-    </div>
-  );
-}
-
-const LazyImage: React.FC<{ src: string; alt: string; className: string }> =
-  React.memo(
-    ({
-      src,
-      alt,
-      className,
-    }: {
-      src: string;
-      alt: string;
-      className: string;
-    }) => {
-      const [isLoaded, setIsLoaded] = useState(false);
-      const [isInView, setIsInView] = useState(false);
-      const imgRef = React.useRef<HTMLDivElement>(null);
-
-      useEffect(() => {
-        const observer = new IntersectionObserver(
-          ([entry]) => {
-            if (entry.isIntersecting) {
-              setIsInView(true);
-              observer.disconnect();
-            }
-          },
-          { threshold: 0.1 },
-        );
-
-        const currentImgRef = imgRef.current; // Capture the current value
-
-        if (currentImgRef) {
-          observer.observe(currentImgRef);
-        }
-
-        return () => {
-          if (currentImgRef) {
-            observer.unobserve(currentImgRef);
-          }
-        };
-      }, []);
-
-      return (
-        <div ref={imgRef} className={`${className} bg-gray-300`}>
-          {isInView && (
-            <img
-              src={src}
-              alt={alt}
-              className={`${className} ${isLoaded ? "opacity-100" : "opacity-0"} transition-opacity duration-300`}
-              onLoad={() => setIsLoaded(true)}
-            />
-          )}
-        </div>
-      );
-    },
-  );
-
-function FAQItem({
-  faq,
-  isOpen,
-  toggleFAQ,
-}: {
-  faq: FAQ;
-  isOpen: boolean;
-  toggleFAQ: () => void;
-}) {
-  return (
-    <div className="border-b border-gray-700">
-      <Button
-        className="flex justify-between items-center w-full py-4 px-6 text-left focus:outline-none"
-        onClick={toggleFAQ}
-        theme="secondary"
-      >
-        <span className="text-lg font-semibold text-white">{faq.question}</span>
-        <Icon
-          icon={isOpen ? Icons.CHEVRON_UP : Icons.CHEVRON_DOWN}
-          className={`text-white transition-transform duration-300 ${isOpen ? "transform rotate-180" : ""}`}
-        />
-      </Button>
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <p className="py-4 px-6 text-gray-300">{faq.answer}</p>
-      </div>
-    </div>
-  );
-}
-
-function FAQSection({ faqs }: { faqs: FAQ[] }) {
-  const [openFAQs, setOpenFAQs] = useState<number[]>([]);
-
-  function toggleFAQ(index: number) {
-    setOpenFAQs((prev: number[]) =>
-      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
-    );
-  }
-
-  return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold text-white mb-4">
-        Frequently Asked Questions
-      </h2>
-      <div className="bg-gray-800 rounded-lg overflow-hidden">
-        {faqs.map((faq, index) => (
-          <FAQItem
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            faq={faq}
-            isOpen={openFAQs.includes(index)}
-            toggleFAQ={() => toggleFAQ(index)}
-          />
-        ))}
-      </div>
     </div>
   );
 }
