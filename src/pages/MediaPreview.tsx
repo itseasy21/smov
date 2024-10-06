@@ -265,7 +265,7 @@ export function MediaPreview() {
       ratingValue: mediaDetails.vote_average,
       bestRating: "10",
       worstRating: "0",
-      reviewCount: reviews.length ?? 7,
+      reviewCount: reviews.length === 0 ? 7 : reviews.length,
     },
     director: credits.crew.find((person) => person.job === "Director")?.name,
     actor: credits.cast.slice(0, 5).map((actor) => ({
@@ -307,18 +307,18 @@ export function MediaPreview() {
   return (
     <SubPageLayout>
       <Helmet>
-        <title>{`${title} Full ${mediaType} - Watch Now`}</title>
+        <title>{`Watch ${title} Full ${mediaType === "movie" ? "Movie" : "TV Show"} Online`}</title>
         <meta
           name="description"
           content={`Stream ${title} full movie online. ${mediaDetails.overview}`}
         />
         <meta
           name="keywords"
-          content={`watch ${title}, ${mediaType}, ${mediaDetails.genres.map((g) => g.name).join(", ")}, streaming, online, full movie`}
+          content={`watch ${title}, ${mediaType}, ${mediaDetails.genres.map((g) => g.name).join(", ")}, streaming, online, full movie, 123movies, fmovies`}
         />
         <meta
           property="og:title"
-          content={`${title} Full ${mediaType} - Watch Now`}
+          content={`Watch ${title} Full ${mediaType === "movie" ? "Movie" : "TV Show"} Online`}
         />
         <meta
           property="og:description"
