@@ -11,6 +11,7 @@ import { ThiccContainer } from "@/components/layout/ThinContainer";
 import LazyImage from "@/components/lazyimage/LazyImage";
 import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
 import { YouTubeEmbed } from "@/components/YoutubeEmbed";
+import { useIsMobile } from "@/hooks/useIsMobile";
 import { conf } from "@/setup/config";
 import { MediaItem } from "@/utils/mediaTypes";
 import { cleanTitle } from "@/utils/title";
@@ -103,6 +104,7 @@ export function MediaPreview() {
   const [trivia, setTrivia] = useState<Trivia[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const isMobile = useIsMobile().isMobile;
 
   const getBestBackdrop = useCallback((tmpImages: Images) => {
     if (tmpImages.backdrops.length === 0) return null;
@@ -224,7 +226,7 @@ export function MediaPreview() {
   const runtime = mediaDetails.runtime || mediaDetails.episode_run_time?.[0];
   const bestBackdropPath = getBestBackdrop(images);
   const heroImageUrl = bestBackdropPath
-    ? `https://image.tmdb.org/t/p/original${bestBackdropPath}`
+    ? `https://image.tmdb.org/t/p/${isMobile ? "w300" : "original"}${bestBackdropPath}`
     : null;
 
   const faqs: FAQ[] = [
@@ -300,7 +302,7 @@ export function MediaPreview() {
     release_date: releaseDate ? new Date(releaseDate) : undefined,
     type: mediaType === "movie" ? "movie" : "show",
     poster: mediaDetails.poster_path
-      ? `https://image.tmdb.org/t/p/w500${mediaDetails.poster_path}`
+      ? `https://image.tmdb.org/t/p/w154${mediaDetails.poster_path}`
       : undefined,
   };
 
@@ -343,12 +345,13 @@ export function MediaPreview() {
       {heroImageUrl && (
         <div
           className="relative w-full h-[40vh] mb-8 overflow-hidden"
-          style={{ marginTop: "-90px" }}
+          style={{ marginTop: "-80px" }}
         >
           <LazyImage
             src={heroImageUrl}
             alt={`${title} backdrop`}
             className="w-full h-full object-cover object-top"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent">
             <ThiccContainer classNames="h-full flex flex-col justify-end pb-8">
@@ -365,13 +368,20 @@ export function MediaPreview() {
 
       <ThiccContainer>
         <div className="flex flex-col md:flex-row items-start mt-8">
-          <div className="w-full md:w-1/3 mb-6 md:mb-0 md:mr-8">
-            <LazyImage
-              src={`https://image.tmdb.org/t/p/w500${mediaDetails.poster_path}`}
-              alt={title}
-              className="w-full rounded-xl shadow-lg"
-            />
-          </div>
+          {!isMobile && (
+            <div className="w-full md:w-1/3 mb-6 md:mb-0 md:mr-8">
+              <LazyImage
+                src={`https://image.tmdb.org/t/p/${isMobile ? "w200" : "w342"}${mediaDetails.poster_path}`}
+                alt={title}
+                className={
+                  isMobile
+                    ? "rounded-xl shadow-lg"
+                    : "w-full rounded-xl shadow-lg"
+                }
+                loading="eager"
+              />
+            </div>
+          )}
           <div className="w-full md:w-2/3">
             <p className="text-gray-300 mb-4">{mediaDetails.overview}</p>
             <p className="mt-2 mb-4">
@@ -458,7 +468,7 @@ export function MediaPreview() {
               videoId={trailer.key}
               width="100%"
               height="400px"
-              imgSize="maxresdefault"
+              imgSize="sddefault"
             />
           </div>
         )}
@@ -470,11 +480,12 @@ export function MediaPreview() {
               <LazyImage
                 src={
                   actor.profile_path
-                    ? `https://image.tmdb.org/t/p/w185${actor.profile_path}`
-                    : "https://placehold.co/24x42"
+                    ? `https://image.tmdb.org/t/p/w92${actor.profile_path}`
+                    : "https://placehold.co/92x92"
                 }
                 alt={actor.name}
                 className="w-24 h-24 object-cover rounded-full mb-2"
+                loading="lazy"
               />
               <p className="text-center text-sm text-gray-300">{actor.name}</p>
               <p className="text-center text-xs text-gray-400">
@@ -490,9 +501,10 @@ export function MediaPreview() {
             <LazyImage
               // eslint-disable-next-line react/no-array-index-key
               key={`screenshot-${index}`}
-              src={`https://image.tmdb.org/t/p/w500${image.file_path}`}
+              src={`https://image.tmdb.org/t/p/w300${image.file_path}`}
               alt={`${title} screenshot ${index + 1}`}
               className="w-full rounded-lg"
+              loading="lazy"
             />
           ))}
         </div>
@@ -568,9 +580,10 @@ export function MediaPreview() {
                 }
               >
                 <LazyImage
-                  src={`https://image.tmdb.org/t/p/w300${media.poster_path}`}
+                  src={`https://image.tmdb.org/t/p/w154${media.poster_path}`}
                   alt={media.title || media.name || ""}
                   className="w-full rounded-lg shadow-lg transition-transform duration-300 hover:scale-105"
+                  loading="lazy"
                 />
                 <p className="text-sm text-gray-300 mt-2">
                   {media.title || media.name}
