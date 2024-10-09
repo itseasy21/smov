@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 
+import { useIsMobile } from "@/hooks/useIsMobile";
+
 interface LazyImageProps {
   src: string;
   alt: string;
@@ -12,6 +14,7 @@ const LazyImage: React.FC<LazyImageProps> = React.memo(
     const [isLoaded, setIsLoaded] = useState(false);
     const [isInView, setIsInView] = useState(loading === "eager");
     const imgRef = React.useRef<HTMLDivElement>(null);
+    const isMobile = useIsMobile();
 
     useEffect(() => {
       if (loading === "eager") {
@@ -43,7 +46,10 @@ const LazyImage: React.FC<LazyImageProps> = React.memo(
     }, [loading]);
 
     return (
-      <div ref={imgRef} className={`${className} bg-gray-300`}>
+      <div
+        ref={imgRef}
+        className={`${className} ${isMobile ? undefined : "bg-gray-300"}`}
+      >
         {(isInView || loading === "eager") && (
           <img
             src={src}
