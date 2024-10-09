@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -13,6 +13,7 @@ import { MediaBookmarkButton } from "@/components/media/MediaBookmark";
 import { YouTubeEmbed } from "@/components/YoutubeEmbed";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { conf } from "@/setup/config";
+import { useGA4 } from "@/setup/ga";
 import { MediaItem } from "@/utils/mediaTypes";
 import { cleanTitle } from "@/utils/title";
 
@@ -104,6 +105,7 @@ export function MediaPreview() {
   const [trivia, setTrivia] = useState<Trivia[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { sendEvent } = useGA4();
   const isMobile = useIsMobile().isMobile;
 
   const getBestBackdrop = useCallback((tmpImages: Images) => {
@@ -177,6 +179,16 @@ export function MediaPreview() {
 
   const handleWatchNow = () => {
     const title = mediaDetails?.title || mediaDetails?.name || "";
+    sendEvent("watch_now", {
+      media_type: mediaType,
+      media_id: id,
+      title,
+      time: Date.now(),
+      url: window.location.href,
+      referrer: document.referrer,
+      platform: isMobile ? "mobile" : "desktop",
+      user_agent: window.navigator.userAgent,
+    });
     navigate(`/media/tmdb-${mediaType}-${id}-${cleanTitle(title)}`);
   };
 

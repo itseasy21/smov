@@ -31,6 +31,8 @@ import { Layout } from "@/setup/Layout";
 import { useHistoryListener } from "@/stores/history";
 import { LanguageProvider } from "@/stores/language";
 
+import { useGA4 } from "./ga";
+
 const DeveloperPage = lazy(() => import("@/pages/DeveloperPage"));
 const TestView = lazy(() => import("@/pages/developer/TestView"));
 const PlayerView = lazyWithPreload(() => import("@/pages/PlayerView"));
@@ -94,6 +96,8 @@ function App() {
   useOnlineListener();
   const maintenance = false; // Shows maintance page
   const [showDowntime, setShowDowntime] = useState(maintenance);
+  const { sendPageView } = useGA4(false);
+  const location = useLocation();
 
   const handleButtonClick = () => {
     setShowDowntime(false);
@@ -106,6 +110,10 @@ function App() {
       sessionStorage.setItem("downtimeToken", "true");
     }
   }, [setShowDowntime, maintenance]);
+
+  useEffect(() => {
+    sendPageView(location.pathname + location.search);
+  }, [location, sendPageView]);
 
   return (
     <Layout>
