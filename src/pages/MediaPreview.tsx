@@ -334,6 +334,7 @@ export function MediaPreview() {
         <meta property="og:url" content={window.location.href} />
         <link rel="canonical" href={window.location.href} />
         <script type="application/ld+json">{JSON.stringify(schemaData)}</script>
+        {heroImageUrl && <link rel="preload" as="image" href={heroImageUrl} />}
         <style type="text/css">{`
           html, body {
             scrollbar-width: none;
