@@ -351,7 +351,7 @@ export function MediaPreview() {
             src={heroImageUrl}
             alt={`${title} backdrop`}
             className="w-full h-full object-cover object-top"
-            loading="lazy"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent">
             <ThiccContainer classNames="h-full flex flex-col justify-end pb-8">
